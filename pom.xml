@@ -8,11 +8,11 @@
         <version>3.2.5</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>ma.enset</groupId>
-    <artifactId>DigitalBanking_Spring_Angular</artifactId>
+    <groupId>ma.mundia</groupId>
+    <artifactId>Banque_Digital_Backend</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>DigitalBanking_Spring_Angular</name>
-    <description>DigitalBanking_Spring_Angular</description>
+    <name>Banque_Digital_Backend</name>
+    <description>Banque_Digital_Backend</description>
     <properties>
         <java.version>17</java.version>
     </properties>
