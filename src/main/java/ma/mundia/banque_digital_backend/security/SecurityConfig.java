@@ -28,6 +28,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import javax.crypto.spec.SecretKeySpec;
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -36,15 +37,17 @@ public class SecurityConfig {
 
     @Value("${jwt.secret}")
     private String secretKey;
+
     @Bean
     public InMemoryUserDetailsManager inMemoryUserDetailsManager() {
         PasswordEncoder passwordEncoder = passwordEncoder();
         return new InMemoryUserDetailsManager(
-                User.withUsername("Admin").password(passwordEncoder.encode("123")).roles("ADMIN","MANAGER","USER").build(),
+                User.withUsername("Admin").password(passwordEncoder.encode("123")).roles("ADMIN", "MANAGER", "USER").build(),
                 User.withUsername("manager").password(passwordEncoder.encode("123")).roles("MANAGER").build(),
                 User.withUsername("user").password(passwordEncoder.encode("123")).roles("USER").build()
         );
     }
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -58,6 +61,7 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers("/chatbot/**").permitAll() // Autorisez l'accès au chatbot
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()))
                 .build();
@@ -85,9 +89,9 @@ public class SecurityConfig {
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
-        corsConfiguration.addAllowedOrigin("*");
-        corsConfiguration.addAllowedMethod("*");
-        corsConfiguration.addAllowedHeader("*");
+        corsConfiguration.setAllowedOrigins(List.of("http://localhost:4200")); // Autorisez uniquement Angular
+        corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
+        corsConfiguration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", corsConfiguration);

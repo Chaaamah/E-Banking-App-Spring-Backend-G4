@@ -38,4 +38,10 @@ public interface BankAccountService {
     AccountHistoryDTO getAccountHistory(String id, int page, int size) throws BankAccountNotFoundException;
 
     List<CustomerDTO> searchCustomers(String keyword);
+
+    List<BankAccountDTO> getBankAccountsByCustomerId(Long customerId);
+
+    SavingBankAccountDTO saveSavingBankAccount(double initialBalance, double interestRate, Long customerId) throws CustomerNotFoundException;
+
+    CurrentBankAccountDTO saveCurrentBankAccount(double initialBalance, double overDraft, Long customerId) throws CustomerNotFoundException;
 }

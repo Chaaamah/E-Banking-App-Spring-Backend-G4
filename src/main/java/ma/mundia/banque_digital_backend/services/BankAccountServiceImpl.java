@@ -228,4 +228,50 @@ public class BankAccountServiceImpl implements BankAccountService {
         return customerRepository.searchCustomer(keyword).stream().map(bankAccountMapper::fromCustomer).collect(Collectors.toList());
     }
 
+    @Override
+    public List<BankAccountDTO> getBankAccountsByCustomerId(Long customerId) {
+        List<BankAccount> bankAccountList = bankAccountRepository.getBankAccountByCustomer_Id(customerId);
+        List<BankAccountDTO> bankAccountDTOS;
+
+        bankAccountDTOS = bankAccountList.stream().map(bankAccount -> {
+            if(bankAccount instanceof CurrentAccount) {
+                return bankAccountMapper.fromCurrentBankAccount((CurrentAccount) bankAccount);
+            } else {
+                return bankAccountMapper.fromSavingBankAccount((SavingAccount) bankAccount);
+            }
+        }).collect(Collectors.toList());
+
+        return bankAccountDTOS;
+    }
+
+    @Override
+    public CurrentBankAccountDTO saveCurrentBankAccount(double initialBalance, double overDraft, Long customerId) throws CustomerNotFoundException {
+        Customer client = customerRepository.findById(customerId).orElseThrow(() -> new CustomerNotFoundException("Customer not found"));
+        CurrentAccount currentAccount = CurrentAccount.builder()
+                .id(UUID.randomUUID().toString())
+                .balance(initialBalance)
+                .customer(client)
+                .status(AccountStatus.CREATED)
+                .creationDate(new Date())
+                .overdraft(overDraft)
+                .build();
+        bankAccountRepository.save(currentAccount);
+        return bankAccountMapper.fromCurrentBankAccount(currentAccount);
+    }
+
+    @Override
+    public SavingBankAccountDTO saveSavingBankAccount(double initialBalance, double interestRate, Long customerId) throws CustomerNotFoundException {
+        Customer client = customerRepository.findById(customerId).orElseThrow(() -> new CustomerNotFoundException("Customer not found"));
+        SavingAccount savingAccount = SavingAccount.builder()
+                .id(UUID.randomUUID().toString())
+                .balance(initialBalance)
+                .customer(client)
+                .status(AccountStatus.CREATED)
+                .creationDate(new Date())
+                .rate(interestRate)
+                .build();
+        bankAccountRepository.save(savingAccount);
+        return bankAccountMapper.fromSavingBankAccount(savingAccount);
+    }
+
 }

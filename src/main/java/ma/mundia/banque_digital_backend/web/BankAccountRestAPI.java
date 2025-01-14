@@ -1,10 +1,9 @@
 package ma.mundia.banque_digital_backend.web;
 
-import ma.mundia.banque_digital_backend.dtos.AccountHistoryDTO;
-import ma.mundia.banque_digital_backend.dtos.AccountOperationDTO;
-import ma.mundia.banque_digital_backend.dtos.BankAccountDTO;
+import ma.mundia.banque_digital_backend.dtos.*;
 import ma.mundia.banque_digital_backend.exception.BalanceInsiffucientException;
 import ma.mundia.banque_digital_backend.exception.BankAccountNotFoundException;
+import ma.mundia.banque_digital_backend.exception.CustomerNotFoundException;
 import ma.mundia.banque_digital_backend.services.BankAccountService;
 import org.springframework.web.bind.annotation.*;
 
@@ -55,4 +54,26 @@ public class BankAccountRestAPI {
         bankAccountService.transfer(from, to, amount);
     }
 
+    @PostMapping("/customers/{customerId}/current-accounts")
+    public CurrentBankAccountDTO saveCurrentBankAccount(
+            @RequestBody CurrentAccountRequest request,
+            @PathVariable Long customerId) throws CustomerNotFoundException {
+        return bankAccountService.saveCurrentBankAccount(
+                request.getInitialBalance(),
+                request.getOverDraft(),
+                customerId
+        );
+    }
+
+    @PostMapping("/customers/{customerId}/saving-accounts")
+    public SavingBankAccountDTO saveSavingBankAccount(
+            @RequestBody SavingAccountRequest request,
+            @PathVariable Long customerId) throws CustomerNotFoundException {
+        return bankAccountService.saveSavingBankAccount(request.getInitialBalance(), request.getInterestRate(), customerId);
+    }
+    @GetMapping("/customers/{customerId}/accounts")
+    public List<BankAccountDTO> getBankAccountsByCustomerId(@PathVariable Long customerId) {
+        List<BankAccountDTO> bankAccountDTOS = bankAccountService.getBankAccountsByCustomerId(customerId);
+        return bankAccountDTOS;
+    }
 }
